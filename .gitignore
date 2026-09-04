@@ -45,5 +45,5 @@ next-env.d.ts
 /payload.db-*
 /payload.db.bak-*
 /backups
-/src/payload-types.ts
 /public/media
+# payload-types.ts is intentionally NOT ignored — it's committed (see below).

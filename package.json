@@ -21,6 +21,7 @@
     "@payloadcms/db-sqlite": "^3.88.0",
     "@payloadcms/next": "^3.88.0",
     "@payloadcms/richtext-lexical": "^3.88.0",
+    "@payloadcms/storage-vercel-blob": "^3.88.0",
     "@payloadcms/ui": "^3.88.0",
     "@react-three/drei": "^10.7.7",
     "@react-three/fiber": "^9.6.1",

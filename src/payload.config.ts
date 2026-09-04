@@ -2,6 +2,7 @@ import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { sqliteAdapter } from "@payloadcms/db-sqlite";
 import { lexicalEditor } from "@payloadcms/richtext-lexical";
+import { vercelBlobStorage } from "@payloadcms/storage-vercel-blob";
 import { buildConfig } from "payload";
 import sharp from "sharp";
 
@@ -60,6 +61,20 @@ export default buildConfig({
     Leads,
   ],
   globals: [CompanySettings],
+  plugins: [
+    // Uploaded files (project covers, team photos) live on local disk by
+    // default, which works locally and on Docker/a VPS but not on Vercel —
+    // serverless functions there have no persistent writable storage, so a
+    // freshly-uploaded file would vanish on the next deploy. This plugin
+    // gracefully no-ops back to local disk storage whenever
+    // BLOB_READ_WRITE_TOKEN isn't set (i.e. everywhere except Vercel with a
+    // Blob store attached), so local dev and Docker are unaffected.
+    vercelBlobStorage({
+      enabled: true,
+      collections: { media: true },
+      token: process.env.BLOB_READ_WRITE_TOKEN,
+    }),
+  ],
   // Deliberately no `|| ""` fallback — Payload signs every admin session JWT
   // with this value, so a missing env var must fail the boot loudly rather
   // than silently start signing tokens with an empty, guessable secret.
@@ -77,6 +92,10 @@ export default buildConfig({
   db: sqliteAdapter({
     client: {
       url: process.env.DATABASE_URI || "file:./payload.db",
+      // Only a hosted libsql database (e.g. Turso) needs this — a local
+      // "file:" URL has no server to authenticate against, so this stays
+      // undefined (and libsql ignores it) for local dev.
+      authToken: process.env.DATABASE_AUTH_TOKEN,
     },
     // WAL allows concurrent readers alongside a writer (e.g. an admin edit
     // landing at the same moment as a contact-form POST) instead of the
