@@ -39,3 +39,11 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# payload cms (local admin backend)
+/payload.db
+/payload.db-*
+/payload.db.bak-*
+/backups
+/src/payload-types.ts
+/public/media

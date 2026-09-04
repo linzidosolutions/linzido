@@ -1,0 +1,59 @@
+# Single-container setup using the same SQLite adapter as local dev — zero
+# architecture change, works immediately with `docker compose up --build`.
+#
+# To scale beyond one instance later, swap to Postgres exactly the way the
+# codebase already documents (src/payload.config.ts's db adapter is the only
+# line that changes): add a `db: postgres:16-alpine` service here, point
+# DATABASE_URI at it, and drop the sqlite volume below.
+#
+# Before the FIRST `up` against a fresh (empty) sqlite-data volume, apply
+# migrations once, using the one-off `migrate` service below (it shares the
+# same volumes as `web`, so it reaches the same database file):
+#   docker compose run --rm migrate
+# See MIGRATIONS.md for the full migration/backup workflow.
+
+services:
+  web:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        # Needed at build time too — several pages are statically generated
+        # against Payload during `next build`.
+        PAYLOAD_SECRET: ${PAYLOAD_SECRET}
+        DATABASE_URI: ${DATABASE_URI:-file:./data/payload.db}
+    ports:
+      - "3000:3000"
+    environment:
+      PAYLOAD_SECRET: ${PAYLOAD_SECRET}
+      DATABASE_URI: ${DATABASE_URI:-file:./data/payload.db}
+      NODE_ENV: production
+    volumes:
+      # Persist the SQLite file and uploaded media across container restarts
+      # and redeploys — without these, both reset to empty on every rebuild.
+      - sqlite-data:/app/data
+      - media-data:/app/public/media
+    restart: unless-stopped
+
+  # One-off: `docker compose run --rm migrate` (see comment above). Targets
+  # the `builder` stage, which still has the full `payload` CLI + source —
+  # the `web` image above is Next's trimmed standalone output and doesn't.
+  # Shares `web`'s volumes so it operates on the same database file.
+  migrate:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: builder
+      args:
+        PAYLOAD_SECRET: ${PAYLOAD_SECRET}
+        DATABASE_URI: ${DATABASE_URI:-file:./data/payload.db}
+    environment:
+      PAYLOAD_SECRET: ${PAYLOAD_SECRET}
+      DATABASE_URI: ${DATABASE_URI:-file:./data/payload.db}
+    volumes:
+      - sqlite-data:/app/data
+    entrypoint: ["npx", "payload", "migrate"]
+
+volumes:
+  sqlite-data:
+  media-data:

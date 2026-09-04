@@ -1,0 +1,439 @@
+@import "tailwindcss";
+
+/* ============================================================
+   LINZIDO — DESIGN SYSTEM
+   Dark · Minimal · Luxury · Cinematic · Editorial
+   ============================================================ */
+
+:root {
+  /* Core palette */
+  --bg: #050505;
+  --bg-2: #101010;
+  --surface: #0f0f12;
+  --line: rgba(255, 255, 255, 0.08);
+  --line-strong: rgba(255, 255, 255, 0.16);
+
+  --fg: #ffffff;
+  --fg-dim: rgba(255, 255, 255, 0.62);
+  --fg-faint: rgba(255, 255, 255, 0.38);
+
+  /* Accent — Deep Red */
+  --accent: #e53935;
+  --accent-bright: #ff5a4e;
+  --accent-deep: #8e1510;
+  --accent-glow: rgba(229, 57, 53, 0.55);
+
+  /* Radii & motion */
+  --r-sm: 10px;
+  --r-md: 16px;
+  --r-lg: 24px;
+  --r-xl: 34px;
+  --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-io: cubic-bezier(0.65, 0, 0.35, 1);
+
+  --nav-h: 76px;
+  --container: 1320px;
+}
+
+@theme inline {
+  --color-bg: var(--bg);
+  --color-bg-2: var(--bg-2);
+  --color-surface: var(--surface);
+  --color-fg: var(--fg);
+  --color-fg-dim: var(--fg-dim);
+  --color-fg-faint: var(--fg-faint);
+  --color-accent: var(--accent);
+  --color-accent-bright: var(--accent-bright);
+  --color-line: var(--line);
+
+  --font-sans: var(--font-inter);
+  --font-display: var(--font-display);
+  --font-mono: var(--font-mono);
+}
+
+* {
+  box-sizing: border-box;
+  min-width: 0;
+}
+
+html {
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+  scroll-behavior: auto; /* Lenis handles smooth scroll */
+}
+
+body {
+  background: var(--bg);
+  color: var(--fg);
+  font-family: var(--font-sans), system-ui, sans-serif;
+  overflow-x: clip;
+  font-feature-settings: "ss01", "cv01";
+  letter-spacing: -0.01em;
+}
+
+/* Lenis */
+html.lenis,
+html.lenis body {
+  height: auto;
+}
+.lenis.lenis-smooth {
+  scroll-behavior: auto !important;
+}
+.lenis.lenis-stopped {
+  overflow: clip;
+}
+
+::selection {
+  background: var(--accent);
+  color: #fff;
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+}
+::-webkit-scrollbar-track {
+  background: var(--bg);
+}
+::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.12);
+  border-radius: 20px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.22);
+}
+
+/* ---------- Typography helpers ---------- */
+.font-display {
+  font-family: var(--font-display), var(--font-sans), sans-serif;
+  letter-spacing: -0.035em;
+  line-height: 0.95;
+}
+.font-mono {
+  font-family: var(--font-mono), ui-monospace, monospace;
+}
+
+.display-xl {
+  font-family: var(--font-display), sans-serif;
+  font-weight: 500;
+  font-size: clamp(3rem, 11vw, 12rem);
+  line-height: 0.9;
+  letter-spacing: -0.04em;
+}
+.display-lg {
+  font-family: var(--font-display), sans-serif;
+  font-weight: 500;
+  font-size: clamp(2.6rem, 7vw, 6.5rem);
+  line-height: 0.94;
+  letter-spacing: -0.035em;
+}
+.display-md {
+  font-family: var(--font-display), sans-serif;
+  font-weight: 500;
+  font-size: clamp(2rem, 4.5vw, 4rem);
+  line-height: 1;
+  letter-spacing: -0.03em;
+}
+
+.eyebrow {
+  font-family: var(--font-mono), monospace;
+  font-size: 0.72rem;
+  letter-spacing: 0.24em;
+  text-transform: uppercase;
+  color: var(--fg-faint);
+}
+
+/* Gradient / accent text */
+.text-gradient {
+  background: linear-gradient(120deg, #fff 20%, var(--accent-bright) 65%, #fff 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+/* ---------- Layout ---------- */
+.container-x {
+  width: 100%;
+  max-width: var(--container);
+  margin-inline: auto;
+  padding-inline: clamp(1.25rem, 4vw, 3rem);
+}
+/* Fully opaque, not a translucent glimpse of the fixed background behind it.
+   The 3D workshop scene's rooms (Developer Room, Marketing Centre, etc.) are
+   deliberately visible at overlapping scroll ranges as part of the cinematic
+   journey — with anything less than full opacity here, that same imagery was
+   bleeding straight through page content (About, Process, ...) that comes
+   after the journey, since the fixed canvas never unmounts and keeps
+   painting behind everything for the rest of the page. */
+.section {
+  position: relative;
+  z-index: 1;
+  padding-block: clamp(5rem, 12vh, 11rem);
+  background: var(--bg);
+}
+
+/* ---------- Surfaces ---------- */
+.glass {
+  background: linear-gradient(
+    180deg,
+    rgba(255, 255, 255, 0.05),
+    rgba(255, 255, 255, 0.015)
+  );
+  border: 1px solid var(--line);
+  @apply backdrop-blur-lg backdrop-saturate-150;
+}
+.hairline {
+  border: 1px solid var(--line);
+}
+
+/* Reveal primitives (JS toggles [data-inview]) */
+[data-reveal] {
+  opacity: 0;
+  transform: translateY(28px);
+  filter: blur(8px);
+  transition: opacity 0.9s var(--ease-out), transform 0.9s var(--ease-out),
+    filter 0.9s var(--ease-out);
+  will-change: opacity, transform, filter;
+}
+[data-reveal][data-inview="true"] {
+  opacity: 1;
+  transform: none;
+  filter: blur(0);
+}
+
+/* Animated conic border for feature cards */
+.glow-border {
+  position: relative;
+  isolation: isolate;
+}
+.glow-border::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  padding: 1px;
+  background: linear-gradient(
+    130deg,
+    rgba(255, 255, 255, 0.22),
+    rgba(255, 255, 255, 0.02) 40%,
+    var(--accent-glow) 100%
+  );
+  -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  opacity: 0;
+  transition: opacity 0.5s var(--ease-out);
+  pointer-events: none;
+}
+.glow-border:hover::before {
+  opacity: 1;
+}
+
+/* Marquee */
+@keyframes marquee-x {
+  to {
+    transform: translateX(-50%);
+  }
+}
+.marquee-track {
+  display: flex;
+  width: max-content;
+  animation: marquee-x var(--speed, 40s) linear infinite;
+}
+.marquee-paused:hover .marquee-track {
+  animation-play-state: paused;
+}
+
+/* Grain / noise overlay */
+@keyframes grain {
+  0%, 100% { transform: translate(0, 0); }
+  10% { transform: translate(-4%, -4%); }
+  30% { transform: translate(3%, -2%); }
+  50% { transform: translate(-2%, 4%); }
+  70% { transform: translate(4%, 2%); }
+  90% { transform: translate(-3%, 3%); }
+}
+
+/* Floating drift for gradient orbs */
+@keyframes drift {
+  0%, 100% { transform: translate(0, 0) scale(1); }
+  50% { transform: translate(4%, -6%) scale(1.08); }
+}
+@keyframes drift-2 {
+  0%, 100% { transform: translate(0, 0) scale(1.05); }
+  50% { transform: translate(-5%, 5%) scale(0.95); }
+}
+@keyframes spin-slow {
+  to { transform: rotate(360deg); }
+}
+@keyframes pulse-glow {
+  0%, 100% { opacity: 0.55; }
+  50% { opacity: 1; }
+}
+@keyframes blink {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.15; }
+}
+
+.cursor-none * {
+  cursor: none !important;
+}
+
+/* Buttons */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.6rem;
+  border-radius: 100px;
+  font-weight: 500;
+  font-size: 0.95rem;
+  padding: 1rem 1.6rem;
+  transition: transform 0.4s var(--ease-out), background 0.4s var(--ease-out),
+    color 0.4s var(--ease-out), border-color 0.4s var(--ease-out);
+  cursor: pointer;
+  white-space: nowrap;
+}
+.btn-primary {
+  background: var(--fg);
+  color: #000;
+}
+.btn-primary:hover {
+  background: var(--accent);
+  color: #fff;
+}
+.btn-ghost {
+  background: transparent;
+  color: var(--fg);
+  border: 1px solid var(--line-strong);
+}
+.btn-ghost:hover {
+  border-color: var(--fg);
+  background: rgba(255, 255, 255, 0.04);
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+/* Accessibility: honor reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
+  }
+  [data-reveal] {
+    opacity: 1 !important;
+    transform: none !important;
+    filter: none !important;
+  }
+}
+
+/* ── Cinematic Journey ─────────────────────────────────────────────────────── */
+
+/* Full-viewport pinned scene container */
+.cj-scene {
+  position: relative;
+  height: 100vh;
+  overflow: hidden;
+  background: #050505;
+}
+
+/* Video fills the scene, object-fit cover */
+.cj-video {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+/* "Scroll to begin" hint — center-bottom */
+.cj-hint {
+  position: absolute;
+  bottom: 2.5rem;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  color: rgba(255, 255, 255, 0.38);
+  font-family: var(--font-mono), ui-monospace, monospace;
+  font-size: 0.65rem;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  white-space: nowrap;
+  pointer-events: none;
+  user-select: none;
+}
+
+.cj-hint-bar {
+  display: block;
+  width: 2rem;
+  height: 1px;
+  background: rgba(255, 255, 255, 0.18);
+}
+
+/* Identity overlay — appears when laptop screen fills the frame */
+.cj-identity {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  pointer-events: none;
+  user-select: none;
+}
+
+.cj-identity-eyebrow {
+  font-family: var(--font-mono), ui-monospace, monospace;
+  font-size: 0.65rem;
+  letter-spacing: 0.28em;
+  text-transform: uppercase;
+  color: var(--accent);
+  margin-bottom: 0.8rem;
+}
+
+.cj-identity-name {
+  font-family: var(--font-display), system-ui, sans-serif;
+  font-weight: 500;
+  font-size: clamp(1.8rem, 4.5vw, 3.8rem);
+  letter-spacing: -0.035em;
+  line-height: 0.95;
+  color: #ffffff;
+  margin-bottom: 1.25rem;
+  text-align: center;
+}
+
+.cj-identity-tags {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+  justify-content: center;
+  max-width: 36rem;
+}
+
+.cj-identity-tag {
+  font-family: var(--font-mono), ui-monospace, monospace;
+  font-size: 0.7rem;
+  color: rgba(255, 255, 255, 0.45);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  padding: 0.3rem 0.9rem;
+  border-radius: 100px;
+  white-space: nowrap;
+}
+
+/* ── End Cinematic Journey ─────────────────────────────────────────────────── */
+
+/* Focus ring for keyboard users */
+:focus-visible {
+  outline: 2px solid var(--accent-bright);
+  outline-offset: 3px;
+  border-radius: 4px;
+}

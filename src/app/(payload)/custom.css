@@ -1,0 +1,131 @@
+/**
+ * Linzido admin theme. Layers on top of Payload's own stylesheet (which is
+ * wrapped in `@layer payload-default`, so these unlayered rules win the
+ * cascade automatically — no !important needed).
+ *
+ * Only overrides confirmed, documented Payload theme hooks — never repaints
+ * the semantic success/error/warning ramps, since those still need to read
+ * as "success"/"error" in toasts and validation states.
+ */
+
+@import url("https://fonts.googleapis.com/css2?family=Bebas+Neue&display=swap");
+
+:root {
+  --font-body: -apple-system, BlinkMacSystemFont, "Segoe UI", Inter, Roboto,
+    sans-serif;
+  /* Branded focus ring instead of Payload's default green. */
+  --accessibility-outline: 2px solid #e53935;
+}
+
+/* Primary action buttons (Save, Publish, Create) — brand red instead of grey. */
+.btn--style-primary {
+  --bg-color: #e53935;
+  --hover-bg: #ff5a4e;
+  --color: #ffffff;
+}
+
+/* Sidebar panel — a hair darker than the page and separated by a hairline,
+   so it reads as a distinct dock rather than text floating on the page. */
+.nav {
+  background: #070707;
+  border-inline-end: 1px solid rgba(255, 255, 255, 0.08);
+}
+/* NOTE: never override --nav-padding-block-start / .nav__scroll's top padding.
+   Payload pins a sticky collapse toggle over the top of this scroll area
+   (height:0, sticky, positioned to match --app-header-height) and calculates
+   the default top padding specifically to clear it. A fixed px override here
+   previously undercut that clearance and made the toggle overlap the first
+   group heading ("COLLECTIONS" read as "LECTIONS"). */
+
+/* Sidebar group headings (Collections / Globals) — real section dividers. */
+.nav-group {
+  margin-bottom: 22px;
+}
+.nav-group__toggle {
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.35);
+  padding-block-end: 10px;
+  margin-bottom: 8px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+.nav-group__toggle:hover {
+  color: #e53935;
+}
+
+/* Sidebar links — taller rows, brand hover, and a red current-page bar. */
+.nav__link {
+  border-radius: 8px;
+  padding-block: 9px;
+  padding-inline-start: 12px;
+  margin-inline: -12px;
+  margin-block-end: 2px;
+  font-size: 15px;
+  color: rgba(255, 255, 255, 0.75);
+  transition: background 0.15s ease, color 0.15s ease;
+}
+.nav__link:hover {
+  background: rgba(229, 57, 53, 0.1);
+  color: #ffffff;
+}
+.nav__link-indicator {
+  background: #e53935;
+  width: 3px;
+}
+/* The current page renders as a plain div, not a link — make it obviously current. */
+div.nav__link {
+  color: #ffffff;
+  font-weight: 600;
+  background: rgba(229, 57, 53, 0.08);
+}
+
+/* Slightly softer corners across cards, inputs and buttons for a premium feel. */
+.card,
+.btn,
+input,
+textarea,
+select {
+  border-radius: 8px;
+}
+
+/* Dashboard — "Collections" / "Globals" group headings. */
+.collections__label {
+  font-size: 22px;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  margin-block: 4px 18px;
+  padding-inline-start: 14px;
+  border-inline-start: 3px solid #e53935;
+}
+.collections__group + .collections__group {
+  margin-top: 40px;
+}
+
+/* Dashboard collection/global cards — bordered, lift + red glow on hover. */
+.card {
+  background: #101010;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  padding: 18px 20px;
+  transition: border-color 0.18s ease, transform 0.18s ease, background 0.18s ease;
+}
+.card:hover {
+  border-color: rgba(229, 57, 53, 0.55);
+  background: #141414;
+  transform: translateY(-2px);
+}
+.card__title {
+  font-size: 15px;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.9);
+}
+.card__actions .btn {
+  border-radius: 50%;
+  color: rgba(255, 255, 255, 0.4);
+  transition: color 0.15s ease, border-color 0.15s ease;
+}
+.card:hover .card__actions .btn {
+  color: #e53935;
+  border-color: #e53935;
+}

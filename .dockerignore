@@ -1,0 +1,16 @@
+node_modules
+.next
+.git
+.gitignore
+.env
+.env.local
+.env.*.local
+payload.db
+payload.db-*
+payload.db.bak-*
+backups
+public/media
+npm-debug.log*
+.DS_Store
+*.md
+.claude
