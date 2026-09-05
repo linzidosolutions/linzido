@@ -60,7 +60,7 @@ export default function Hero({ ready, company }: { ready: boolean; company: Comp
             </span>
           </div>
 
-          <h1 className="font-display text-[clamp(2.8rem,8vw,7rem)] font-medium leading-[0.9] tracking-[-0.04em]">
+          <h1 className="font-display text-[clamp(2.15rem,8vw,7rem)] font-medium leading-[0.95] tracking-[-0.04em] sm:leading-[0.9]">
             <AnimatedText text="One team builds" trigger="mount" className="block" />
             <AnimatedText
               text="the website, the CRM,"
@@ -101,7 +101,7 @@ export default function Hero({ ready, company }: { ready: boolean; company: Comp
                 />
               </svg>
             </MagneticButton>
-            <MagneticButton href="#contact" variant="ghost">
+            <MagneticButton href={company.phone ? `tel:+${company.phone}` : "#contact"} variant="ghost">
               Book a Call
             </MagneticButton>
           </div>

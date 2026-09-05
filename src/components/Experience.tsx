@@ -110,7 +110,7 @@ export default function Experience({
       <Background particles={!is3D} />
 
       <Cursor />
-      <Navbar onOpenPalette={() => setPaletteOpen(true)} />
+      <Navbar onOpenPalette={() => setPaletteOpen(true)} company={company} />
       <CommandPalette
         open={paletteOpen}
         setOpen={setPaletteOpen}

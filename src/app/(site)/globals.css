@@ -150,6 +150,19 @@ html.lenis body {
   background-clip: text;
   color: transparent;
 }
+/* AnimatedText (Hero) wraps each word in its own inline-block span for the
+   rise-in reveal, two DOM levels below the element `.text-gradient` is
+   applied to — `background: inherit` only reaches the immediate parent
+   (a plain overflow:hidden wrapper with no background of its own), so the
+   gradient never reached the actual text and rendered fully invisible.
+   Repeating the literal gradient on each word fixes it; per-word rather
+   than one continuous sweep, but visible beats seamless. */
+.text-gradient [data-unit] {
+  background: linear-gradient(120deg, #fff 20%, var(--accent-bright) 65%, #fff 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
 
 /* ---------- Layout ---------- */
 .container-x {

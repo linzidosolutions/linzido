@@ -333,7 +333,7 @@ export interface Project {
       }[]
     | null;
   /**
-   * The client's live site — card links here when set.
+   * The client's live site — card links here when set. https:// is added automatically if omitted.
    */
   liveUrl?: string | null;
   /**

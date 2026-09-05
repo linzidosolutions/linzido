@@ -1,3 +1,4 @@
+import { cache } from "react";
 import { getPayload } from "payload";
 import config from "@payload-config";
 import type {
@@ -28,7 +29,12 @@ const getClient = () => getPayload({ config });
 
 export type ServiceWithSubServices = Service & { subServices: SubService[] };
 
-export async function getServices(): Promise<ServiceWithSubServices[]> {
+// Wrapped in React's cache() — generateMetadata and the page component it
+// describes both call these during the same render, and without this they
+// each re-ran the query independently. Memoizing per-request (it resets
+// between requests, unlike a module-level cache) turns what was 2-3x the
+// necessary Payload/DB round-trips per page into one.
+export const getServices = cache(async (): Promise<ServiceWithSubServices[]> => {
   const payload = await getClient();
   const [services, subServices] = await Promise.all([
     payload.find({
@@ -55,14 +61,16 @@ export async function getServices(): Promise<ServiceWithSubServices[]> {
       })
       .sort((a, b) => a.order - b.order),
   }));
-}
+});
 
-export async function getServiceBySlug(slug: string): Promise<ServiceWithSubServices | null> {
-  const services = await getServices();
-  return services.find((s) => s.slug === slug) ?? null;
-}
+export const getServiceBySlug = cache(
+  async (slug: string): Promise<ServiceWithSubServices | null> => {
+    const services = await getServices();
+    return services.find((s) => s.slug === slug) ?? null;
+  }
+);
 
-export async function getProjects(): Promise<Project[]> {
+export const getProjects = cache(async (): Promise<Project[]> => {
   const payload = await getClient();
   const result = await payload.find({
     collection: "projects",
@@ -72,9 +80,9 @@ export async function getProjects(): Promise<Project[]> {
     depth: 1,
   });
   return result.docs;
-}
+});
 
-export async function getProjectBySlug(slug: string): Promise<Project | null> {
+export const getProjectBySlug = cache(async (slug: string): Promise<Project | null> => {
   const payload = await getClient();
   const result = await payload.find({
     collection: "projects",
@@ -83,9 +91,9 @@ export async function getProjectBySlug(slug: string): Promise<Project | null> {
     depth: 1,
   });
   return result.docs[0] ?? null;
-}
+});
 
-export async function getTeamMembers(): Promise<TeamMember[]> {
+export const getTeamMembers = cache(async (): Promise<TeamMember[]> => {
   const payload = await getClient();
   const result = await payload.find({
     collection: "team-members",
@@ -94,9 +102,9 @@ export async function getTeamMembers(): Promise<TeamMember[]> {
     depth: 1,
   });
   return result.docs;
-}
+});
 
-export async function getTestimonials(): Promise<Testimonial[]> {
+export const getTestimonials = cache(async (): Promise<Testimonial[]> => {
   const payload = await getClient();
   const result = await payload.find({
     collection: "testimonials",
@@ -105,9 +113,9 @@ export async function getTestimonials(): Promise<Testimonial[]> {
     depth: 0,
   });
   return result.docs;
-}
+});
 
-export async function getProcessSteps(): Promise<ProcessStep[]> {
+export const getProcessSteps = cache(async (): Promise<ProcessStep[]> => {
   const payload = await getClient();
   const result = await payload.find({
     collection: "process-steps",
@@ -116,9 +124,9 @@ export async function getProcessSteps(): Promise<ProcessStep[]> {
     depth: 0,
   });
   return result.docs;
-}
+});
 
-export async function getFaqs(relatedServiceId?: number): Promise<Faq[]> {
+export const getFaqs = cache(async (relatedServiceId?: number): Promise<Faq[]> => {
   const payload = await getClient();
   const result = await payload.find({
     collection: "faqs",
@@ -130,9 +138,9 @@ export async function getFaqs(relatedServiceId?: number): Promise<Faq[]> {
     depth: 0,
   });
   return result.docs;
-}
+});
 
-export async function getCompanySettings(): Promise<CompanySetting> {
+export const getCompanySettings = cache(async (): Promise<CompanySetting> => {
   const payload = await getClient();
   return payload.findGlobal({ slug: "company-settings", depth: 0 });
-}
+});

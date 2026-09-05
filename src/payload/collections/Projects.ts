@@ -60,7 +60,24 @@ export const Projects: CollectionConfig = {
     {
       name: "liveUrl",
       type: "text",
-      admin: { description: "The client's live site — card links here when set." },
+      admin: {
+        description:
+          "The client's live site — card links here when set. https:// is added automatically if omitted.",
+      },
+      hooks: {
+        // A bare domain (e.g. "example.com") saves as a same-site relative
+        // link instead of an external one — the case study page's "Visit
+        // site" link would then point at /work/example.com instead of
+        // leaving the site.
+        beforeChange: [
+          ({ value }) => {
+            if (typeof value !== "string") return value;
+            const trimmed = value.trim();
+            if (!trimmed) return trimmed;
+            return /^https?:\/\//i.test(trimmed) ? trimmed : `https://${trimmed}`;
+          },
+        ],
+      },
     },
     {
       name: "study",

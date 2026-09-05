@@ -40,7 +40,12 @@ export default function CommandPalette({
     const activeSocials = (company.socials ?? []).filter((s) => Boolean(s.href));
     const contact: Cmd[] = [
       { label: "Email Us", hint: "Contact", action: () => (window.location.href = `mailto:${company.email}`) },
-      { label: "Book a Call", hint: "Contact", action: () => go("#contact") },
+      {
+        label: "Book a Call",
+        hint: "Contact",
+        action: () =>
+          (window.location.href = company.phone ? `tel:+${company.phone}` : "#contact"),
+      },
       ...activeSocials.map((s) => ({
         label: s.label,
         hint: "Social",

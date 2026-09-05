@@ -5,15 +5,44 @@ import { gsap } from "gsap";
 import Logo from "@/components/ui/Logo";
 import { prefersReducedMotion } from "@/lib/utils";
 
+const INTRO_SHOWN_KEY = "linzido-intro-shown";
+
+// sessionStorage throws in some privacy modes (Safari private browsing with
+// certain settings, sandboxed iframes) — treat that the same as "not shown
+// yet" rather than crashing the page.
+function hasShownIntro() {
+  try {
+    return sessionStorage.getItem(INTRO_SHOWN_KEY) === "1";
+  } catch {
+    return false;
+  }
+}
+function markIntroShown() {
+  try {
+    sessionStorage.setItem(INTRO_SHOWN_KEY, "1");
+  } catch {
+    // Nothing to fall back to — worst case the intro replays next load.
+  }
+}
+
 /**
  * First-paint experience: black screen, animated counter 0→100, logo
  * reveal, then a panel wipe that uncovers the page. Locks scroll while
  * active and calls onDone so the hero can start its entrance.
+ *
+ * Only plays in full once per browser session — a returning visitor
+ * clicking back to "/" or reloading shouldn't have to sit through the same
+ * ~2.25s cinematic intro again just to reach content they've already seen.
  */
 export default function Preloader({ onDone }: { onDone: () => void }) {
-  // Lazy initializer — reduced-motion visitors render at 100% on first paint
-  // instead of a setState call right after mount.
-  const [count, setCount] = useState(() => (prefersReducedMotion() ? 100 : 0));
+  // Always starts at 0 — both prefersReducedMotion() and hasShownIntro()
+  // read browser-only state (matchMedia / sessionStorage) that doesn't exist
+  // during SSR. Branching the initial render on either one here would make
+  // the client's first render disagree with the server-rendered HTML
+  // (server always sees the "not yet shown" case) and trip a hydration
+  // mismatch. The effect below re-checks both immediately after mount,
+  // client-only, and fast-forwards from there instead.
+  const [count, setCount] = useState(0);
   const [hidden, setHidden] = useState(false);
   const rootRef = useRef<HTMLDivElement>(null);
   const barRef = useRef<HTMLDivElement>(null);
@@ -34,6 +63,7 @@ export default function Preloader({ onDone }: { onDone: () => void }) {
         onComplete: () => {
           setHidden(true);
           document.body.style.overflow = "";
+          markIntroShown();
           onDoneRef.current();
         },
       });
@@ -45,7 +75,8 @@ export default function Preloader({ onDone }: { onDone: () => void }) {
         }, "-=0.1");
     };
 
-    if (prefersReducedMotion()) {
+    if (prefersReducedMotion() || hasShownIntro()) {
+      setCount(100);
       const t = setTimeout(() => {
         setHidden(true);
         document.body.style.overflow = "";
@@ -119,9 +150,9 @@ export default function Preloader({ onDone }: { onDone: () => void }) {
           />
         </div>
       </div>
-      <div className="absolute bottom-10 left-0 right-0 flex items-end justify-between px-8 md:px-14">
+      <div className="absolute bottom-10 left-0 right-0 flex flex-col items-start gap-3 px-8 sm:flex-row sm:items-end sm:justify-between md:px-14">
         <span className="eyebrow">Loading experience</span>
-        <span className="font-display text-6xl font-medium tabular-nums md:text-8xl">
+        <span className="font-display text-4xl font-medium tabular-nums sm:text-6xl md:text-8xl">
           {count}
           <span className="text-[#4d6dff]">%</span>
         </span>
